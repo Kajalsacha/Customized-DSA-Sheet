@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>DSA Practice Sheet</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+  <link rel="stylesheet" href="style.css"/>
+</head>
+<body>
+
+<!-- ── HEADER ─────────────────────────────────────────────────── -->
+<header>
+  <div class="header-inner">
+    <a class="logo" href="#">
+      <div class="logo-icon">⚡</div>
+      <div class="logo-text">DSA<span>Sheet</span></div>
+    </a>
+    <div class="search-wrap">
+      <span class="search-icon">🔍</span>
+      <input type="text" id="searchInput" placeholder="Search problems, topics, companies…" autocomplete="off" spellcheck="false"/>
+    </div>
+    <nav class="header-nav">
+      <button class="nav-btn active" data-view="sheet">📋 Sheet</button>
+      <button class="nav-btn" data-view="dashboard">📊 Dashboard</button>
+      <button class="nav-btn" data-view="calendar">📅 Calendar</button>
+      <button class="nav-btn" data-view="schedule">🗓️ Schedule</button>
+    </nav>
+    <div class="header-controls">
+      <div class="filter-group">
+        <button class="filter-btn active" data-filter="all">All</button>
+        <button class="filter-btn easy"   data-filter="easy">Easy</button>
+        <button class="filter-btn medium" data-filter="medium">Medium</button>
+        <button class="filter-btn hard"   data-filter="hard">Hard</button>
+      </div>
+      <button class="icon-btn" id="exportBtn" title="Export CSV">⬇️</button>
+      <button class="icon-btn" id="themeToggle" title="Toggle theme">☀️</button>
+    </div>
+  </div>
+</header>
+
+<!-- ── MAIN ───────────────────────────────────────────────────── -->
+<main>
+
+  <!-- ═══════════ SHEET VIEW ═══════════ -->
+  <div id="view-sheet" class="view active">
+
+    <!-- Stats Bar -->
+    <div class="stats-bar">
+      <div class="stat-cards">
+        <div class="stat-card">
+          <div class="stat-icon total">📋</div>
+          <div class="stat-info"><div class="stat-value" id="statTotal">—</div><div class="stat-label">Total</div></div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon solved">✅</div>
+          <div class="stat-info"><div class="stat-value" id="statSolved">0</div><div class="stat-label">Solved</div></div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon percent">📈</div>
+          <div class="stat-info"><div class="stat-value" id="statPct">0%</div><div class="stat-label">Complete</div></div>
+        </div>
+
+        <div class="stat-card">
+          <div class="stat-icon bookmark-stat">🔖</div>
+          <div class="stat-info"><div class="stat-value" id="statBookmarks">0</div><div class="stat-label">Bookmarked</div></div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon streak-stat">🔥</div>
+          <div class="stat-info"><div class="stat-value" id="statStreak">0</div><div class="stat-label">Day Streak</div></div>
+        </div>
+      </div>
+      <div class="progress-section">
+        <div class="progress-header">
+          <span class="progress-title">Overall Progress</span>
+          <span class="progress-pct" id="progressPct">0%</span>
+        </div>
+        <div class="progress-track"><div class="progress-fill" id="progressFill"></div></div>
+        <!-- Difficulty rings -->
+        <div class="diff-rings" id="diffRings"></div>
+      </div>
+    </div>
+
+    <!-- Filter chips -->
+    <div class="chip-bar">
+      <button class="chip active" data-chip="all">All</button>
+      <button class="chip" data-chip="bookmarked">🔖 Bookmarked</button>
+      <button class="chip" data-chip="revision">🔁 Revision</button>
+      <button class="chip" data-chip="unsolved">⭕ Unsolved</button>
+      <button class="chip" data-chip="solved">✅ Solved</button>
+    </div>
+
+    <div id="loading"><div class="spinner"></div><p>Loading problems…</p></div>
+    <div id="content" style="display:none"><div id="categories"></div></div>
+  </div>
+
+  <!-- ═══════════ DASHBOARD VIEW ═══════════ -->
+  <div id="view-dashboard" class="view">
+    <div class="dash-grid">
+      <div class="dash-card full">
+        <div class="dash-card-title">📊 Topic-wise Progress</div>
+        <div id="topicChart"></div>
+      </div>
+      <div class="dash-card">
+        <div class="dash-card-title">🎯 Difficulty Breakdown</div>
+        <div class="ring-chart-wrap" id="ringChart"></div>
+      </div>
+      <div class="dash-card">
+        <div class="dash-card-title">🏆 Top Companies</div>
+        <div id="companyChart"></div>
+      </div>
+      <div class="dash-card full">
+        <div class="dash-card-title">🔥 Activity Heatmap (Last 6 Months)</div>
+        <div id="heatmap"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══════════ CALENDAR VIEW ═══════════ -->
+  <div id="view-calendar" class="view">
+    <div class="cal-header">
+      <button class="cal-nav" id="calPrev">‹</button>
+      <div class="cal-title" id="calTitle"></div>
+      <button class="cal-nav" id="calNext">›</button>
+    </div>
+    <div class="cal-grid" id="calGrid"></div>
+    <div class="cal-legend">
+      <span class="legend-item"><span class="legend-dot solved-dot"></span>Solved</span>
+      <span class="legend-item"><span class="legend-dot revision-dot"></span>Revision due</span>
+      <span class="legend-item"><span class="legend-dot streak-dot"></span>Active day</span>
+    </div>
+    <!-- Day detail panel -->
+    <div id="dayPanel" class="day-panel" style="display:none">
+      <div class="day-panel-header">
+        <span id="dayPanelTitle"></span>
+        <button id="dayPanelClose">✕</button>
+      </div>
+      <div id="dayPanelContent"></div>
+    </div>
+  </div>
+
+  <!-- ═══════════ SCHEDULE VIEW ═══════════ -->
+  <div id="view-schedule" class="view">
+    <div class="schedule-setup" id="scheduleSetup">
+      <div class="schedule-card">
+        <h2 class="schedule-heading">🗓️ Generate Study Schedule</h2>
+        <p class="schedule-sub">Auto-assign all unsolved problems across N days</p>
+        <div class="sched-form">
+          <div class="sched-field">
+            <label>Start Date</label>
+            <input type="date" id="schedStart"/>
+          </div>
+          <div class="sched-field">
+            <label>Problems per day</label>
+            <input type="number" id="schedPerDay" value="5" min="1" max="20"/>
+          </div>
+          <div class="sched-field">
+            <label>Prioritise</label>
+            <select id="schedPriority">
+              <option value="order">Original order</option>
+              <option value="easy-first">Easy → Medium → Hard</option>
+              <option value="hard-first">Hard → Medium → Easy</option>
+              <option value="revision">Revision-flagged first</option>
+            </select>
+          </div>
+        </div>
+        <button class="btn-primary" id="generateSchedule">Generate Schedule ✨</button>
+      </div>
+    </div>
+    <div id="scheduleOutput" style="display:none">
+      <div class="sched-toolbar">
+        <span id="schedSummary"></span>
+        <button class="btn-secondary" id="clearSchedule">Clear Schedule</button>
+      </div>
+      <div id="schedDays"></div>
+    </div>
+  </div>
+
+</main>
+
+<!-- ── NOTE MODAL ─────────────────────────────────────────────── -->
+<div id="noteModal" class="modal" style="display:none">
+  <div class="modal-box">
+    <div class="modal-header">
+      <span id="noteModalTitle">📝 Notes</span>
+      <button id="noteModalClose">✕</button>
+    </div>
+    <textarea id="noteText" placeholder="Write your notes, approach, complexity…"></textarea>
+    <div class="modal-footer">
+      <button class="btn-secondary" id="noteModalClose2">Cancel</button>
+      <button class="btn-primary" id="noteSave">Save Note</button>
+    </div>
+  </div>
+</div>
+
+<!-- ── TIMER MODAL ────────────────────────────────────────────── -->
+<div id="timerModal" class="modal" style="display:none">
+  <div class="modal-box timer-box">
+    <div class="modal-header">
+      <span id="timerProblemName">⏱️ Timer</span>
+      <button id="timerClose">✕</button>
+    </div>
+    <div class="timer-display" id="timerDisplay">00:00</div>
+    <div class="timer-controls">
+      <button class="btn-primary" id="timerStartStop">▶ Start</button>
+      <button class="btn-secondary" id="timerReset">↺ Reset</button>
+    </div>
+    <div class="timer-log" id="timerLog"></div>
+  </div>
+</div>
+
+<script src="script.js"></script>
+</body>
+</html>
